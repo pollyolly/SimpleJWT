@@ -20,6 +20,7 @@ class SimpleJWT {
         $sign = base64_encode($this->hash_key($thp));
         return hash_equals($sign, $tsign);
     }
+	//return if cookie exists in your browser
     public function verify_cookietoken($token){
         $ctokenID = isset($_COOKIE['_Secure-Fgp_']) ? $_COOKIE['_Secure-Fgp_'] : $_COOKIE['_Secure-Fgp_'];
         $payload = $this->extract_paypload($token);
@@ -110,7 +111,7 @@ $sjwt = new SimpleJWT();
  */
 /*$token = $sjwt->token($array);
  echo $token;*/
-$token = "eyJ0eXAiOiJKV1QiLCJhbGdvIjoic2hhMjU2In0=.eyJpc3N1ZXJJRCI6IjM2ZDcwMmQxOThiMjgwMDdiOTE0NmMzZTVmOGVkN2ZhNDk5ZGIyNmZkNDRlNDQ5YTdhYmQ4ZmQxNThkNTZkZjUiLCJjdG9rZW5JRCI6ImMyM2JlMjU3ZjE3Y2FjNmY4OWNlYWU0YTljNjZmN2U4MDFhOTNiNmNjMDJjY2Q3N2NmZTUwNzc2MzA5YTAxZjYiLCJpc3N1ZWRBdCI6IjIwMTgtMDktMTEgMTI6MDk6MzhwbSIsIm5vdEJlZm9yZSI6IjIwMTgtMDktMTEgMTI6MDk6MzhwbSIsImV4cGlyZXNBdCI6IjIwMTgtMDktMTIgMTI6MDk6MzhwbSJ9.NmQ0ZTgxODE5NGRkNGMxMDgxN2VhNjQ4NTgxYjdmOWNmODc5MDA4YmFmMTY3OGQwZTg3ZDA4NzBjN2I3YzVhMw==";
+//$token = "eyJ0eXAiOiJKV1QiLCJhbGdvIjoic2hhMjU2In0=.eyJpc3N1ZXJJRCI6IjM2ZDcwMmQxOThiMjgwMDdiOTE0NmMzZTVmOGVkN2ZhNDk5ZGIyNmZkNDRlNDQ5YTdhYmQ4ZmQxNThkNTZkZjUiLCJjdG9rZW5JRCI6ImMyM2JlMjU3ZjE3Y2FjNmY4OWNlYWU0YTljNjZmN2U4MDFhOTNiNmNjMDJjY2Q3N2NmZTUwNzc2MzA5YTAxZjYiLCJpc3N1ZWRBdCI6IjIwMTgtMDktMTEgMTI6MDk6MzhwbSIsIm5vdEJlZm9yZSI6IjIwMTgtMDktMTEgMTI6MDk6MzhwbSIsImV4cGlyZXNBdCI6IjIwMTgtMDktMTIgMTI6MDk6MzhwbSJ9.NmQ0ZTgxODE5NGRkNGMxMDgxN2VhNjQ4NTgxYjdmOWNmODc5MDA4YmFmMTY3OGQwZTg3ZDA4NzBjN2I3YzVhMw==";
 // echo $sjwt->hash_key('sample', FALSE);
 /**
  * Check 
@@ -125,7 +126,7 @@ $token = "eyJ0eXAiOiJKV1QiLCJhbGdvIjoic2hhMjU2In0=.eyJpc3N1ZXJJRCI6IjM2ZDcwMmQxO
  * Check 
  * Verify Token
  */
-if(@$sjwt->verify_token($token)){
+/*if(@$sjwt->verify_token($token)){
     echo "Verified token! \n";
 //    var_dump($sjwt->extract_payload($token));
     if(@$sjwt->verify_cookietoken($token)){
@@ -133,5 +134,5 @@ if(@$sjwt->verify_token($token)){
     }
 } else {
     echo "Verification failed! \n"; 
-}
+}*/
 //echo $sjwt->ende_cryption('', 'decrypt');
