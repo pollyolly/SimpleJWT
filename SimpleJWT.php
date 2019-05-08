@@ -53,6 +53,7 @@ class SimpleJWT {
     }
     //you may use this to encrypt/decrypt sensive key=>value in payload
     public function ende_cryption($data, $action){
+	    	$key = '';
 	   	if(function_exists('openssl_cipher_iv_length')){
 			switch($action){
 				case 'encrypt':
