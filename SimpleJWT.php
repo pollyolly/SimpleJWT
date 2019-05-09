@@ -42,7 +42,7 @@ class SimpleJWT {
     public function check_expiration($token){
         $tdata = explode('.', $token);
         $payload = $this->extract_payload($token);
-        return strtotime('now') > strtotime($payload->expiresAt) ? true : false;
+        return strtotime('now') > strtotime($payload->expiresAt) ? true : false; //if today is greater than tomorrow it is true expired else false;
     }
     //hash data with hashed key
     //default false to return hashed value
