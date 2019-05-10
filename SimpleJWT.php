@@ -1,10 +1,15 @@
 <?php
 class SimpleJWT {
 
+        private $key = null;
+
+        function __construct($key){
+                $this->key = $key;
+        }
     //create token
     public function token($array){
         $header = base64_encode(json_encode($array['header']));
-        $payload = base64_encode(json_encode($array['payload']));
+        $payload = base64_encode($this->ende_cryption(json_encode($array['payload']), 'encrypt'));
         $hp = $header.'.'.$payload;
         $sign = base64_encode($this->hash_key($hp));
         $token = $header.'.'.$payload.'.'.$sign;
@@ -20,7 +25,7 @@ class SimpleJWT {
         $sign = base64_encode($this->hash_key($thp));
         return hash_equals($sign, $tsign);
     }
-	//return if cookie exists in your browser
+        //return if cookie exists in your browser
     public function verify_cookietoken($token){
         $ctokenID = isset($_COOKIE['_Secure-Fgp_']) ? $_COOKIE['_Secure-Fgp_'] : $_COOKIE['_Secure-Fgp_'];
         $payload = $this->extract_paypload($token);
@@ -36,47 +41,44 @@ class SimpleJWT {
     public function extract_payload($token){
         $tdata = explode('.', $token);
         $tpayload = base64_decode($tdata[1]);
-        return json_decode($tpayload);
+        return json_decode($this->ende_cryption($tpayload, 'decrypt'));
     }
     //return true if expired
     public function check_expiration($token){
         $tdata = explode('.', $token);
         $payload = $this->extract_payload($token);
-        return strtotime('now') > strtotime($payload->expiresAt) ? true : false; //if today is greater than tomorrow it is true expired else false;
+        return strtotime('now') > strtotime($payload->expiresAt) ? true : false;
     }
     //hash data with hashed key
     //default false to return hashed value
     public function hash_key($data){
-        $key_path= realpath(__DIR__).'\/';
-        $key = file_get_contents($key_path.'key.txt');
-        return hash_hmac('sha256', $data, $key);
+        return hash_hmac('sha256', $data, $this->key);
     }
     //you may use this to encrypt/decrypt sensive key=>value in payload
     public function ende_cryption($data, $action){
-	    	$key = '';
-	   	if(function_exists('openssl_cipher_iv_length')){
-			switch($action){
-				case 'encrypt':
-					$ivlen = openssl_cipher_iv_length($cipher="AES-128-CBC");
-					$iv = openssl_random_pseudo_bytes($ivlen);
-					$ciphertext_raw = openssl_encrypt($data, $cipher, $key, $options=OPENSSL_RAW_DATA, $iv);
-					$hmac = hash_hmac('sha256', $ciphertext_raw, $key, $as_binary=true);
-					$ciphertext = base64_encode( $iv.$hmac.$ciphertext_raw );
-					return $ciphertext;
-				case 'decrypt':
-					$c = base64_decode($data);
-					$ivlen = openssl_cipher_iv_length($cipher="AES-128-CBC");
-					$iv = substr($c, 0, $ivlen);
-					$hmac = substr($c, $ivlen, $sha2len=32);
-					$ciphertext_raw = substr($c, $ivlen+$sha2len);
-					$original_plaintext = openssl_decrypt($ciphertext_raw, $cipher, $key, $options=OPENSSL_RAW_DATA, $iv);
-					$calcmac = hash_hmac('sha256', $ciphertext_raw, $key, $as_binary=true);
-					if (hash_equals($hmac, $calcmac))//timing attack safe comparison
-					{
-					    return $original_plaintext;
-					}
-			}
-    		} else { echo 'OpenSSL Not Installed!'; exit; }
+                if(function_exists('openssl_cipher_iv_length')){
+                        switch($action){
+                                case 'encrypt':
+                                        $ivlen = openssl_cipher_iv_length($cipher="AES-128-CBC");
+                                        $iv = openssl_random_pseudo_bytes($ivlen);
+                                        $ciphertext_raw = openssl_encrypt($data, $cipher, $this->key, $options=OPENSSL_RAW_DATA, $iv);
+                                        $hmac = hash_hmac('sha256', $ciphertext_raw, $this->key, $as_binary=true);
+                                        $ciphertext = base64_encode( $iv.$hmac.$ciphertext_raw );
+                                        return $ciphertext;
+                                case 'decrypt':
+                                        $c = base64_decode($data);
+                                        $ivlen = openssl_cipher_iv_length($cipher="AES-128-CBC");
+                                        $iv = substr($c, 0, $ivlen);
+                                        $hmac = substr($c, $ivlen, $sha2len=32);
+                                        $ciphertext_raw = substr($c, $ivlen+$sha2len);
+                                        $original_plaintext = openssl_decrypt($ciphertext_raw, $cipher, $this->key, $options=OPENSSL_RAW_DATA, $iv);
+                                        $calcmac = hash_hmac('sha256', $ciphertext_raw, $this->key, $as_binary=true);
+                                        if (hash_equals($hmac, $calcmac))//timing attack safe comparison
+                                        {
+                                            return $original_plaintext;
+                                        }
+                        }
+                } else { echo 'OpenSSL Not Installed!'; exit; }
     }
     //generate random issuerid
     public function random_issuerid(){
@@ -93,7 +95,8 @@ class SimpleJWT {
         return $hashid;
     }
 }
-$sjwt = new SimpleJWT();
+$sjwt = new SimpleJWT('SampleKey');
+
 /*$array = array(
      'header' => array(
              'typ' => 'JWT',
